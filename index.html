@@ -26,12 +26,19 @@
     <!-- content-template -->
     <script type="text/x-template" id="content-template">
         <div class="content" >
-            <h1>{{config.title}}</h1>
+            <div class="content-header">
+                <h1>{{config.title}}</h1>
+                <span></span>
+                <button @click="prevPosition()" :disabled="prevDisabled" >Prev</button>
+                <button @click="nextPosition()" :disabled="nextDisabled" >Next</button>
+            </div>
             <p>{{config.description}}</p>
             <div 
+                :key="config.position"
                 v-if="config.contents && config.contents.length" 
-                :is="config.contents[config.position].type" 
-                :config="config.contents[config.position]" ></div>
+                :is="currentContent.type" 
+                @finished="enableNextContent()"
+                :config="currentContent" ></div>
             <!-- {{content}} -->
         </div>
     </script>
@@ -39,6 +46,12 @@
         .content{
             margin: 0;
             padding: 1em;
+        }
+        .content-header{
+            display: flex;
+        }
+        .content-header > span{
+            flex: 1 0;
         }
         .content  h1{
             margin: 0 0 .5em 0;
@@ -65,12 +78,47 @@
                 }
             },
             methods: {
-                
+                prevPosition:function(){
+                    this.config.position--;
+                    if (this.config.position<0){
+                        this.config.position=0;
+                    }
+                },
+                nextPosition:function(){
+                    this.config.position++;
+                    if (this.config.position>=this.config.contents.length){
+                        this.config.position=this.config.contents.length-1;
+                    }
+                },
+                enableNextContent:function(){
+                    console.log("enabled");
+                    var next=this.config.contents[this.config.position+1];
+                    if (next){
+                        next.disabled=false;
+                    }
+                }
+            },
+            computed: {
+                currentContent:function(){
+                    return this.config.contents[this.config.position];
+                },
+                prevDisabled: function(){
+                    if (this.config.position==0) return true;
+                    return false;
+                },
+                nextDisabled: function(){
+                    if (this.config.position+1>=this.config.contents.length) return true;
+                    var next=this.config.contents[this.config.position+1];
+                    if (next.disabled){
+                        return true;
+                    }
+                    return false;
+                },
             }
         });
     </script>
 
-    <!-- content-template -->
+    <!-- video-template -->
     <script type="text/x-template" id="video-template">
         <div class="video" >
             <h2>{{config.title}}</h2>
@@ -121,15 +169,35 @@
                         self.$emit('play', self.player);
                     }
                     if (event.data == YT.PlayerState.ENDED) {
-                        self.$emit('end', self.player);
+                        self.$emit('finished', self.player);
                     }
                 }
-                var onPlayerReady=function(event) {
-                    if (self.config.autoplay){
-                        event.target.playVideo();
+                var videoMonitor=function(){
+                    var pos=self.player.getCurrentTime();
+                    var cfg=self.config;
+                    console.log("pos",cfg,pos);
+                    if (pos>0 && cfg.finishedWhen){
+                        console.log(cfg.finishedWhen.videoPosition);
+                        if (cfg.finishedWhen.videoPosition && cfg.finishedWhen.videoPosition<=pos){
+                            self.$emit('finished', self.player);
+                        }
                     }
-                }                
-                window.onYouTubeIframeAPIReady=function() {
+                    if (window.videoMonitorTimeout){
+                        clearTimeout(window.videoMonitorTimeout);
+                    }
+                    window.videoMonitorTimeout=setTimeout(videoMonitor,1000);
+                }
+                var onPlayerReady=function(event) {
+                    var player=event.target;
+                    if (typeof(self.config.startSeconds)!="undefined"){
+                        player.seekTo(self.config.startSeconds);
+                    }
+                    if (self.config.autoplay){
+                        player.playVideo();
+                    }
+                    videoMonitor();
+                }   
+                var iframeReady=function(){
                     self.player = new YT.Player(self.playerId, {
                         height: '360',
                         width: '640',
@@ -139,6 +207,13 @@
                             'onStateChange': onPlayerStateChange
                         }
                     });
+                }             
+                if (window.YouTubeIframeAPIReady){
+                    iframeReady();
+                }
+                window.onYouTubeIframeAPIReady=function() {
+                    window.YouTubeIframeAPIReady=true;
+                    iframeReady();
                 }
             },
             data: function() {
@@ -147,6 +222,18 @@
                 }
             },
             methods: {
+                mute: function(){
+                    this.player.mute();
+                },
+                unMute: function(){
+                    this.player.unMute();
+                },
+                getCurrentTime: function(){
+                    this.player.getCurrentTime();
+                },
+                getDuration: function(){
+                    this.player.getDuration();
+                },
                 stopVideo:function() {
                     this.player.stopVideo();
                 },

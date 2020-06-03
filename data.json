@@ -10,7 +10,21 @@
             "title" : "Step 1",
             "description" : "First step",
             "videoId" : "M7lc1UVf-VE",
-            "autoplay" : true 
+            "autoplay" : true,
+            "startSeconds" : 0,
+            "finishedWhen" : {
+                "videoPosition" : 1320
+            }
+        },
+        {
+            "type" : "app-video",
+            "id" : "video2",
+            "title" : "Step 2",
+            "description" : "Second step",
+            "videoId" : "M7lc1UVf-VE",
+            "autoplay" : true,
+            "startSeconds" : 0,
+            "disabled" : true
         }
     ]
 }
