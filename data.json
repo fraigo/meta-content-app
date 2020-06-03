@@ -1,0 +1,15 @@
+{
+    "type" : "app-contents",
+    "title" : "Example",
+    "description" : "Example content",
+    "position" : 0,
+    "contents" : [
+        {
+            "type" : "app-video",
+            "title" : "Step 1",
+            "description" : "First step",
+            "videoId" : "M7lc1UVf-VE",
+            "autoplay" : true 
+        }
+    ]
+}

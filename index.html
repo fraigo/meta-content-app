@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App</title>
+    <style>
+        html *{
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        body{
+            padding:0;
+            margin: 0;
+        }
+        .content{
+            margin: 0;
+            padding: 1em;
+        }
+        .content  h1{
+            margin: 0 0 .5em 0;
+        }
+        .content > .content{
+            border: 1px solid #eee;
+        }
+        .video-player{
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div :is="contents.type" :config="contents"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+    <!-- content-template -->
+    <script type="text/x-template" id="content-template">
+        <div class="content" >
+            <h1>{{config.title}}</h1>
+            <p>{{config.description}}</p>
+            <div 
+                v-if="config.contents && config.contents.length" 
+                :is="config.contents[config.position].type" 
+                :config="config.contents[config.position]" ></div>
+            <!-- {{content}} -->
+        </div>
+    </script>
+    <script>
+        Vue.component('app-contents', {
+            template: '#content-template',
+            props: { 
+                "config" : {
+                    "type" : Object,
+                    "default": {}
+                }
+            },
+            mounted:function(){
+                console.log("app-contents.config",this.config);
+            },
+            data: function() {
+                return { 
+                    
+                }
+            },
+            methods: {
+                
+            }
+        });
+    </script>
+
+    <!-- content-template -->
+    <script type="text/x-template" id="video-template">
+        <div class="video" >
+            <h2>{{config.title}}</h2>
+            <p>{{config.description}}</p>
+            <div class="video-player" id="player">{{config.videoId}}</div>
+            <!-- {{content}} -->
+        </div>
+    </script>
+    <script>
+        Vue.component('app-video', {
+            template: '#video-template',
+            data: function(){
+                return {
+                    player : null
+                }
+            },
+            props: { 
+                "config" : {
+                    "type" : Object,
+                    "default": {}
+                }
+            },
+            mounted:function(){
+                console.log("app-video.config",this.content);
+                var self = this;
+
+                // Source: https://developers.google.com/youtube/iframe_api_reference?hl=es-419
+                var tag = document.createElement('script');
+
+                tag.src = "https://www.youtube.com/iframe_api";
+                var firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+                var onPlayerStateChange = function(event) {
+                    console.log("state",event);
+                    if (event.data == YT.PlayerState.PLAYING) {
+                        self.$emit('play', self.player);
+                    }
+                    if (event.data == YT.PlayerState.ENDED) {
+                        self.$emit('end', self.player);
+                    }
+                }
+                var onPlayerReady=function(event) {
+                    if (self.config.autoplay){
+                        event.target.playVideo();
+                    }
+                }                
+                window.onYouTubeIframeAPIReady=function() {
+                    self.player = new YT.Player('player', {
+                        height: '360',
+                        width: '640',
+                        videoId: self.config.videoId,
+                        events: {
+                            'onReady': onPlayerReady,
+                            'onStateChange': onPlayerStateChange
+                        }
+                    });
+                }
+            },
+            data: function() {
+                return { 
+                    
+                }
+            },
+            methods: {
+                stopVideo:function() {
+                    this.player.stopVideo();
+                },
+                loadVideo:function(videoId){
+                    this.player.loadVideoById({
+                        'videoId': videoId,
+                        'startSeconds': 0,
+                        // 'endSeconds': 60,
+                        // 'suggestedQuality': 'large'
+                        }
+                    );
+                },
+                playVideo:function() {
+                    this.player.playVideo();
+                },
+                pauseVideo:function() {
+                    this.player.pauseVideo();
+                },
+                seekTo:function(seconds) {
+                    this.player.seekTo(seconds, false);
+                },
+            }
+        });
+    </script>
+    <!-- app -->
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                contents : {
+                    "title" : "Loading"
+                }
+            },
+            mounted:function(){
+                console.log("mounted",this.contents);
+            },
+            created:function(){
+                var self=this;
+                console.log("created");
+                fetch("data.json?"+Math.random())
+                    .then(function(data){
+                        return data.json()
+                    })
+                    .then(function(json){
+                        console.log("json",json,self.contents);
+                        self.contents=json;
+                        document.title=json.title;
+                    })
+            }
+        })
+    </script>
+</body>
+</html>
