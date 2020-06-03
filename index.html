@@ -13,19 +13,8 @@
             padding:0;
             margin: 0;
         }
-        .content{
-            margin: 0;
-            padding: 1em;
-        }
-        .content  h1{
-            margin: 0 0 .5em 0;
-        }
-        .content > .content{
-            border: 1px solid #eee;
-        }
-        .video-player{
-            width: 100%;
-        }
+        
+        
     </style>
 </head>
 <body>
@@ -46,6 +35,18 @@
             <!-- {{content}} -->
         </div>
     </script>
+    <style>
+        .content{
+            margin: 0;
+            padding: 1em;
+        }
+        .content  h1{
+            margin: 0 0 .5em 0;
+        }
+        .content > .content{
+            border: 1px solid #eee;
+        }
+    </style>
     <script>
         Vue.component('app-contents', {
             template: '#content-template',
@@ -74,10 +75,17 @@
         <div class="video" >
             <h2>{{config.title}}</h2>
             <p>{{config.description}}</p>
-            <div class="video-player" id="player">{{config.videoId}}</div>
+            <div class="video-player" :id="playerId">{{config.videoId}}</div>
             <!-- {{content}} -->
         </div>
     </script>
+    <style>
+        .video-player{
+            width: 100%;
+            height: 60vw;
+            max-height: 100vh;
+        }
+    </style>
     <script>
         Vue.component('app-video', {
             template: '#video-template',
@@ -90,7 +98,11 @@
                 "config" : {
                     "type" : Object,
                     "default": {}
-                }
+                },
+                "id" : {
+                    "type" : String,
+                    "default": "v"+Math.round(Math.random()*10000)
+                },
             },
             mounted:function(){
                 console.log("app-video.config",this.content);
@@ -118,7 +130,7 @@
                     }
                 }                
                 window.onYouTubeIframeAPIReady=function() {
-                    self.player = new YT.Player('player', {
+                    self.player = new YT.Player(self.playerId, {
                         height: '360',
                         width: '640',
                         videoId: self.config.videoId,
@@ -156,6 +168,11 @@
                 seekTo:function(seconds) {
                     this.player.seekTo(seconds, false);
                 },
+            },
+            computed:{
+                playerId: function(){
+                    return 'video_'+this.config.id?this.config.id:this.id
+                }
             }
         });
     </script>

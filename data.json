@@ -6,6 +6,7 @@
     "contents" : [
         {
             "type" : "app-video",
+            "id" : "video1",
             "title" : "Step 1",
             "description" : "First step",
             "videoId" : "M7lc1UVf-VE",
