@@ -39,7 +39,7 @@
                 :is="currentContent.type" 
                 @finished="enableNextContent()"
                 :config="currentContent" ></div>
-            <!-- {{content}} -->
+            <pre v-if="debug">{{currentContent}}</pre>
         </div>
     </script>
     <style>
@@ -67,7 +67,7 @@
                 "config" : {
                     "type" : Object,
                     "default": {}
-                }
+                },
             },
             mounted:function(){
                 console.log("app-contents.config",this.config);
@@ -99,6 +99,9 @@
                 }
             },
             computed: {
+                debug: function(){
+                    return app.debug;
+                },
                 currentContent:function(){
                     return this.config.contents[this.config.position];
                 },
@@ -124,7 +127,6 @@
             <h2>{{config.title}}</h2>
             <p>{{config.description}}</p>
             <div class="video-player" :id="playerId">{{config.videoId}}</div>
-            <!-- {{content}} -->
         </div>
     </script>
     <style>
@@ -175,9 +177,8 @@
                 var videoMonitor=function(){
                     var pos=self.player.getCurrentTime();
                     var cfg=self.config;
-                    console.log("pos",cfg,pos);
+                    //console.log("pos",cfg,pos);
                     if (pos>0 && cfg.finishedWhen){
-                        console.log(cfg.finishedWhen.videoPosition);
                         if (cfg.finishedWhen.videoPosition && cfg.finishedWhen.videoPosition<=pos){
                             self.$emit('finished', self.player);
                         }
@@ -214,11 +215,6 @@
                 window.onYouTubeIframeAPIReady=function() {
                     window.YouTubeIframeAPIReady=true;
                     iframeReady();
-                }
-            },
-            data: function() {
-                return { 
-                    
                 }
             },
             methods: {
@@ -263,6 +259,114 @@
             }
         });
     </script>
+
+    <!-- text-template -->
+    <script type="text/x-template" id="text-template">
+        <div class="text-content" >
+            <h2>{{config.title}}</h2>
+            <p>{{config.description}}</p>
+        </div>
+    </script>
+    <style>
+    .text-content{
+        font-size: 18px;
+    }
+    </style>
+    <script>
+    Vue.component('app-text', {
+        template: '#text-template',
+        data: function(){
+            return {
+                zoom : 1
+            }
+        },
+        props: { 
+            "config" : {
+                "type" : Object,
+                "default": {}
+            },
+            "id" : {
+                "type" : String,
+                "default": "text"+Math.round(Math.random()*10000)
+            },
+        },
+        mounted:function(){
+            console.log("app-text.config",this.content);
+            var self = this;
+        },
+        methods: {
+            
+        },
+        computed:{
+            
+        }
+    });
+    </script>
+
+    <!-- question-template -->
+    <script type="text/x-template" id="question-template">
+        <div class="question-content" >
+            <h2>{{config.title}}</h2>
+            <p>{{config.description}}</p>
+            <ul>
+                <li v-for="(option,index) in config.options" :key="index" >
+                    <input type="radio" :name="id+'opt'" @change="checkAnswer()" v-model="config.selected" :id="id+index" :value="index"><label :for="id+index">{{option}}</label>
+                </li>
+            </ul>
+        </div>
+    </script>
+    <style>
+    .question-content{
+        font-size: 18px;
+    }
+    .question-content ul{
+        margin: 0;
+    }
+    .question-content ul li{
+        margin: 0;
+        display: block;
+    }
+    .question-content ul li label{
+        padding-left: 1em;
+        line-height: 2em;
+    }
+    </style>
+    <script>
+    Vue.component('app-question', {
+        template: '#question-template',
+        data: function(){
+            return {
+                zoom : 1
+            }
+        },
+        props: { 
+            "config" : {
+                "type" : Object,
+                "default": {}
+            },
+            "id" : {
+                "type" : String,
+                "default": "text"+Math.round(Math.random()*10000)
+            },
+        },
+        mounted:function(){
+            console.log("app-question.config",this.content);
+            var self = this;
+        },
+        methods: {
+            checkAnswer:function(){
+                console.log("Checking",this.config.selected,this.config.correct);
+                if (this.config.selected==this.config.correct){
+                    this.$emit("finished");
+                }
+            }
+        },
+        computed:{
+            
+        }
+    });
+    </script>
+
     <!-- app -->
     <script>
         var app = new Vue({
@@ -270,7 +374,8 @@
             data: {
                 contents : {
                     "title" : "Loading"
-                }
+                },
+                debug: false
             },
             mounted:function(){
                 console.log("mounted",this.contents);
