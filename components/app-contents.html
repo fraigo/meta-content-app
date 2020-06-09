@@ -13,6 +13,7 @@
         <p v-if="config.position==-1">{{config.description}}</p>
         <div v-if="config.position==-1" class="content-menu">
             <button class="content-menu-item" @click="goToPosition(idx)" v-for="(item,idx) in config.contents" :disabled="item.disabled">{{idx+1}}</button>
+            <div class="space"></div>
         </div>    
         <div 
             :key="config.position"
@@ -62,7 +63,7 @@
         flex: 1 0;
     }
     #app > .content{
-        padding-top: 4.5em;
+        padding: 4.5em 1em;
     }
     .content  h1{
         margin: 0 0 .5em 0;
@@ -82,20 +83,19 @@
         border: 1px solid #eee;
     }
     .content-menu{
-        display: flex;
+        display: grid;
+        --grid-template-columns: repeat(auto-fit, 140px);
+        grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
         justify-content: space-between;
-        flex-wrap: wrap;
     }
     .content-menu-item{
-        max-width: 140px;
-        max-height: 140px;
-        width: 40vw;
-        height: 40vw;
+        width: 140px;
+        height: 140px;
         border: 1px solid #ccc;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 1em;
+        margin: 0 auto 1em auto;
     }
     .content-footer{
         position: fixed;
@@ -141,8 +141,14 @@
         },
         methods: {
             goTo:function(path){
-                window.scrollTo(0,0);
                 var view=path.replace("#","").split("/");
+                for(var i=0; i<this.config.contents.length; i++){
+                    var item=this.config.contents[i];
+                    if (item.id==view[1]){
+                        this.config.position=i;
+                    }
+                }
+                window.scrollTo(0,0);
                 console.log(view);
             },
             goToPosition:function(pos){

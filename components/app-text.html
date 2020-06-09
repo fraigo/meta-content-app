@@ -2,6 +2,7 @@
 <script type="text/x-template" id="text-template">
     <div class="text-content" >
         <h2>{{config.title}}</h2>
+        <img v-if="config.image" :src="config.image" width="100%">
         <p v-html="config.description"></p>
     </div>
 </script>
@@ -15,6 +16,16 @@
     margin: 2em;
     display: block;
     font-size: 24%;
+}
+.text-content img{
+    max-width: 100%;
+}
+@media (min-width: 480px){
+    .text-content img{
+        max-width: 40%;
+        float: left;
+        padding-right: 20px;
+    }
 }
 </style>
 <script type="text/javascript">
