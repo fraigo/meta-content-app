@@ -1,0 +1,42 @@
+<!-- text-template -->
+<script type="text/x-template" id="text-template">
+    <div class="text-content" >
+        <h2>{{config.title}}</h2>
+        <p>{{config.description}}</p>
+    </div>
+</script>
+<style>
+.text-content{
+    font-size: 18px;
+}
+</style>
+<script type="text/javascript">
+Vue.component('app-text', {
+    template: '#text-template',
+    data: function(){
+        return {
+            zoom : 1
+        }
+    },
+    props: { 
+        "config" : {
+            "type" : Object,
+            "default": {}
+        },
+        "id" : {
+            "type" : String,
+            "default": "text"+Math.round(Math.random()*10000)
+        },
+    },
+    mounted:function(){
+        console.log("app-text.config",this.content);
+        var self = this;
+    },
+    methods: {
+        
+    },
+    computed:{
+        
+    }
+});
+</script>

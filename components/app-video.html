@@ -1,0 +1,138 @@
+<!-- video-template -->
+<script type="text/x-template" id="video-template">
+    <div class="video" >
+        <h2>{{config.title}}</h2>
+        <p>{{config.description}}</p>
+        <div class="video-player" :id="playerId">{{config.videoId}}</div>
+    </div>
+</script>
+<style>
+    .video-player{
+        width: 100%;
+        height: 60vw;
+        max-height: 80vh;
+    }
+</style>
+<script type="text/javascript">
+    Vue.component('app-video', {
+        template: '#video-template',
+        data: function(){
+            return {
+                player : null
+            }
+        },
+        props: { 
+            "config" : {
+                "type" : Object,
+                "default": {}
+            },
+            "id" : {
+                "type" : String,
+                "default": "v"+Math.round(Math.random()*10000)
+            },
+        },
+        mounted:function(){
+            console.log("app-video.config",this.content);
+            var self = this;
+
+            // Source: https://developers.google.com/youtube/iframe_api_reference?hl=es-419
+            var tag = document.createElement('script');
+
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            var onPlayerStateChange = function(event) {
+                console.log("state",event);
+                if (event.data == YT.PlayerState.PLAYING) {
+                    self.$emit('play', self.player);
+                }
+                if (event.data == YT.PlayerState.ENDED) {
+                    self.$emit('finished', self.player);
+                }
+            }
+            var videoMonitor=function(){
+                var pos=self.player.getCurrentTime();
+                var cfg=self.config;
+                //console.log("pos",cfg,pos);
+                if (pos>0 && cfg.finishedWhen){
+                    if (cfg.finishedWhen.videoPosition && cfg.finishedWhen.videoPosition<=pos){
+                        self.$emit('finished', self.player);
+                    }
+                }
+                if (window.videoMonitorTimeout){
+                    clearTimeout(window.videoMonitorTimeout);
+                }
+                window.videoMonitorTimeout=setTimeout(videoMonitor,1000);
+            }
+            var onPlayerReady=function(event) {
+                var player=event.target;
+                if (typeof(self.config.startSeconds)!="undefined"){
+                    player.seekTo(self.config.startSeconds);
+                }
+                if (self.config.autoplay){
+                    player.playVideo();
+                }
+                videoMonitor();
+            }   
+            var iframeReady=function(){
+                self.player = new YT.Player(self.playerId, {
+                    height: '360',
+                    width: '640',
+                    videoId: self.config.videoId,
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }             
+            if (window.YouTubeIframeAPIReady){
+                iframeReady();
+            }
+            window.onYouTubeIframeAPIReady=function() {
+                window.YouTubeIframeAPIReady=true;
+                iframeReady();
+            }
+        },
+        methods: {
+            mute: function(){
+                this.player.mute();
+            },
+            unMute: function(){
+                this.player.unMute();
+            },
+            getCurrentTime: function(){
+                this.player.getCurrentTime();
+            },
+            getDuration: function(){
+                this.player.getDuration();
+            },
+            stopVideo:function() {
+                this.player.stopVideo();
+            },
+            loadVideo:function(videoId){
+                this.player.loadVideoById({
+                    'videoId': videoId,
+                    'startSeconds': 0,
+                    // 'endSeconds': 60,
+                    // 'suggestedQuality': 'large'
+                    }
+                );
+            },
+            playVideo:function() {
+                this.player.playVideo();
+            },
+            pauseVideo:function() {
+                this.player.pauseVideo();
+            },
+            seekTo:function(seconds) {
+                this.player.seekTo(seconds, false);
+            },
+        },
+        computed:{
+            playerId: function(){
+                return 'video_'+this.config.id?this.config.id:this.id
+            }
+        }
+    });
+</script>

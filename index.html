@@ -22,364 +22,6 @@
         <div :is="contents.type" :config="contents"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-
-    <!-- content-template -->
-    <script type="text/x-template" id="content-template">
-        <div class="content" >
-            <div class="content-header">
-                <h1>{{config.title}}</h1>
-                <span></span>
-                <button @click="prevPosition()" :disabled="prevDisabled" >Prev</button>
-                <button @click="nextPosition()" :disabled="nextDisabled" >Next</button>
-            </div>
-            <p>{{config.description}}</p>
-            <div 
-                :key="config.position"
-                v-if="config.contents && config.contents.length" 
-                :is="currentContent.type" 
-                @finished="enableNextContent()"
-                :config="currentContent" ></div>
-            <pre v-if="debug">{{currentContent}}</pre>
-        </div>
-    </script>
-    <style>
-        .content{
-            margin: 0;
-            padding: 1em;
-        }
-        .content-header{
-            display: flex;
-            position:fixed;
-            height: 4em;
-            width: 100%;
-            left: 0;
-            top:0;
-            z-index: 1;
-            background-color: #fff;
-            line-height: 2em;
-            padding: 1em;
-            box-shadow: 0 0 5px 5px rgba(0,0,0,0.2);
-        }
-        .content-header > span{
-            flex: 1 0;
-        }
-        #app > .content{
-            padding-top: 4em;
-        }
-        .content  h1{
-            margin: 0 0 .5em 0;
-        }
-        .content > .content{
-            border: 1px solid #eee;
-        }
-    </style>
-    <script>
-        Vue.component('app-contents', {
-            template: '#content-template',
-            props: { 
-                "config" : {
-                    "type" : Object,
-                    "default": {}
-                },
-            },
-            mounted:function(){
-                console.log("app-contents.config",this.config);
-            },
-            data: function() {
-                return { 
-                    
-                }
-            },
-            methods: {
-                prevPosition:function(){
-                    this.config.position--;
-                    if (this.config.position<0){
-                        this.config.position=0;
-                    }
-                },
-                nextPosition:function(){
-                    this.config.position++;
-                    if (this.config.position>=this.config.contents.length){
-                        this.config.position=this.config.contents.length-1;
-                    }
-                },
-                enableNextContent:function(){
-                    console.log("enabled");
-                    var next=this.config.contents[this.config.position+1];
-                    if (next){
-                        next.disabled=false;
-                    }
-                }
-            },
-            computed: {
-                debug: function(){
-                    return app.debug;
-                },
-                currentContent:function(){
-                    return this.config.contents[this.config.position];
-                },
-                prevDisabled: function(){
-                    if (this.config.position==0) return true;
-                    return false;
-                },
-                nextDisabled: function(){
-                    if (this.config.position+1>=this.config.contents.length) return true;
-                    var next=this.config.contents[this.config.position+1];
-                    if (next.disabled){
-                        return true;
-                    }
-                    return false;
-                },
-            }
-        });
-    </script>
-
-    <!-- video-template -->
-    <script type="text/x-template" id="video-template">
-        <div class="video" >
-            <h2>{{config.title}}</h2>
-            <p>{{config.description}}</p>
-            <div class="video-player" :id="playerId">{{config.videoId}}</div>
-        </div>
-    </script>
-    <style>
-        .video-player{
-            width: 100%;
-            height: 60vw;
-            max-height: 80vh;
-        }
-    </style>
-    <script>
-        Vue.component('app-video', {
-            template: '#video-template',
-            data: function(){
-                return {
-                    player : null
-                }
-            },
-            props: { 
-                "config" : {
-                    "type" : Object,
-                    "default": {}
-                },
-                "id" : {
-                    "type" : String,
-                    "default": "v"+Math.round(Math.random()*10000)
-                },
-            },
-            mounted:function(){
-                console.log("app-video.config",this.content);
-                var self = this;
-
-                // Source: https://developers.google.com/youtube/iframe_api_reference?hl=es-419
-                var tag = document.createElement('script');
-
-                tag.src = "https://www.youtube.com/iframe_api";
-                var firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-                var onPlayerStateChange = function(event) {
-                    console.log("state",event);
-                    if (event.data == YT.PlayerState.PLAYING) {
-                        self.$emit('play', self.player);
-                    }
-                    if (event.data == YT.PlayerState.ENDED) {
-                        self.$emit('finished', self.player);
-                    }
-                }
-                var videoMonitor=function(){
-                    var pos=self.player.getCurrentTime();
-                    var cfg=self.config;
-                    //console.log("pos",cfg,pos);
-                    if (pos>0 && cfg.finishedWhen){
-                        if (cfg.finishedWhen.videoPosition && cfg.finishedWhen.videoPosition<=pos){
-                            self.$emit('finished', self.player);
-                        }
-                    }
-                    if (window.videoMonitorTimeout){
-                        clearTimeout(window.videoMonitorTimeout);
-                    }
-                    window.videoMonitorTimeout=setTimeout(videoMonitor,1000);
-                }
-                var onPlayerReady=function(event) {
-                    var player=event.target;
-                    if (typeof(self.config.startSeconds)!="undefined"){
-                        player.seekTo(self.config.startSeconds);
-                    }
-                    if (self.config.autoplay){
-                        player.playVideo();
-                    }
-                    videoMonitor();
-                }   
-                var iframeReady=function(){
-                    self.player = new YT.Player(self.playerId, {
-                        height: '360',
-                        width: '640',
-                        videoId: self.config.videoId,
-                        events: {
-                            'onReady': onPlayerReady,
-                            'onStateChange': onPlayerStateChange
-                        }
-                    });
-                }             
-                if (window.YouTubeIframeAPIReady){
-                    iframeReady();
-                }
-                window.onYouTubeIframeAPIReady=function() {
-                    window.YouTubeIframeAPIReady=true;
-                    iframeReady();
-                }
-            },
-            methods: {
-                mute: function(){
-                    this.player.mute();
-                },
-                unMute: function(){
-                    this.player.unMute();
-                },
-                getCurrentTime: function(){
-                    this.player.getCurrentTime();
-                },
-                getDuration: function(){
-                    this.player.getDuration();
-                },
-                stopVideo:function() {
-                    this.player.stopVideo();
-                },
-                loadVideo:function(videoId){
-                    this.player.loadVideoById({
-                        'videoId': videoId,
-                        'startSeconds': 0,
-                        // 'endSeconds': 60,
-                        // 'suggestedQuality': 'large'
-                        }
-                    );
-                },
-                playVideo:function() {
-                    this.player.playVideo();
-                },
-                pauseVideo:function() {
-                    this.player.pauseVideo();
-                },
-                seekTo:function(seconds) {
-                    this.player.seekTo(seconds, false);
-                },
-            },
-            computed:{
-                playerId: function(){
-                    return 'video_'+this.config.id?this.config.id:this.id
-                }
-            }
-        });
-    </script>
-
-    <!-- text-template -->
-    <script type="text/x-template" id="text-template">
-        <div class="text-content" >
-            <h2>{{config.title}}</h2>
-            <p>{{config.description}}</p>
-        </div>
-    </script>
-    <style>
-    .text-content{
-        font-size: 18px;
-    }
-    </style>
-    <script>
-    Vue.component('app-text', {
-        template: '#text-template',
-        data: function(){
-            return {
-                zoom : 1
-            }
-        },
-        props: { 
-            "config" : {
-                "type" : Object,
-                "default": {}
-            },
-            "id" : {
-                "type" : String,
-                "default": "text"+Math.round(Math.random()*10000)
-            },
-        },
-        mounted:function(){
-            console.log("app-text.config",this.content);
-            var self = this;
-        },
-        methods: {
-            
-        },
-        computed:{
-            
-        }
-    });
-    </script>
-
-    <!-- question-template -->
-    <script type="text/x-template" id="question-template">
-        <div class="question-content" >
-            <h2>{{config.title}}</h2>
-            <p>{{config.description}}</p>
-            <ul>
-                <li v-for="(option,index) in config.options" :key="index" >
-                    <input type="radio" :name="id+'opt'" @change="checkAnswer()" v-model="config.selected" :id="id+index" :value="index"><label :for="id+index">{{option}}</label>
-                </li>
-            </ul>
-        </div>
-    </script>
-    <style>
-    .question-content{
-        font-size: 18px;
-    }
-    .question-content ul{
-        margin: 0;
-    }
-    .question-content ul li{
-        margin: 0;
-        display: block;
-    }
-    .question-content ul li label{
-        padding-left: 1em;
-        line-height: 2em;
-    }
-    </style>
-    <script>
-    Vue.component('app-question', {
-        template: '#question-template',
-        data: function(){
-            return {
-                zoom : 1
-            }
-        },
-        props: { 
-            "config" : {
-                "type" : Object,
-                "default": {}
-            },
-            "id" : {
-                "type" : String,
-                "default": "text"+Math.round(Math.random()*10000)
-            },
-        },
-        mounted:function(){
-            console.log("app-question.config",this.content);
-            var self = this;
-        },
-        methods: {
-            checkAnswer:function(){
-                console.log("Checking",this.config.selected,this.config.correct);
-                if (this.config.selected==this.config.correct){
-                    this.$emit("finished");
-                }
-            }
-        },
-        computed:{
-            
-        }
-    });
-    </script>
-
     <!-- app -->
     <script>
         var app = new Vue({
@@ -390,13 +32,11 @@
                 },
                 debug: false
             },
-            mounted:function(){
-                console.log("mounted",this.contents);
-            },
             created:function(){
                 var self=this;
                 console.log("created");
-                fetch("data.json?"+Math.random())
+                this.loadComponents(["app-contents","app-question","app-text","app-video"],function(){
+                    fetch("data.json?"+Math.random())
                     .then(function(data){
                         return data.json()
                     })
@@ -405,6 +45,44 @@
                         self.contents=json;
                         document.title=json.title;
                     })
+                })
+
+            },
+            mounted:function(){
+                console.log("mounted",this.contents);
+            },
+            methods: {
+                loadComponents:function(list,callback, pos){
+                    var self = this;
+                    if (!pos){
+                        pos=0;
+                    }
+                    console.log("Loading",pos,list[pos]);
+                    if (!list[pos]){
+                        callback(pos);
+                        return;
+                    }
+                    this.loadComponent(list[pos],function(text){
+                        self.loadComponents(list, callback, pos+1);
+                    })
+                },
+                loadComponent:function(id, callback){
+                    fetch("components/"+id+".html?"+Math.random())
+                    .then(function(data){
+                        return data.text()
+                    })
+                    .then(function(text){
+                        console.log("component",id);
+                        callback(text);
+                        var e=document.createElement("div");
+                        e.id="component-"+id;
+                        e.innerHTML=text;
+                        document.body.appendChild(e);
+                        var script=e.querySelector("script[type='text/javascript']");
+                        console.log("script",script.innerHTML);
+                        eval(script.innerHTML);
+                    })
+                }
             }
         })
     </script>

@@ -1,0 +1,110 @@
+<!-- content-template -->
+<script type="text/x-template" id="content-template">
+    <div class="content" >
+        <div class="content-header">
+            <h1>{{config.title}}</h1>
+            <span></span>
+            <button @click="prevPosition()" :disabled="prevDisabled" >Prev</button>
+            <button @click="nextPosition()" :disabled="nextDisabled" >Next</button>
+        </div>
+        <p>{{config.description}}</p>
+        <div 
+            :key="config.position"
+            v-if="config.contents && config.contents.length" 
+            :is="currentContent.type" 
+            @finished="enableNextContent()"
+            :config="currentContent" ></div>
+        <pre v-if="debug">{{currentContent}}</pre>
+    </div>
+</script>
+<style>
+    .content{
+        margin: 0;
+        padding: 1em;
+    }
+    .content-header{
+        display: flex;
+        position:fixed;
+        height: 4em;
+        width: 100%;
+        left: 0;
+        top:0;
+        z-index: 1;
+        background-color: #fff;
+        line-height: 2em;
+        padding: 1em;
+        box-shadow: 0 0 5px 5px rgba(0,0,0,0.2);
+    }
+    .content-header > span{
+        flex: 1 0;
+    }
+    #app > .content{
+        padding-top: 4em;
+    }
+    .content  h1{
+        margin: 0 0 .5em 0;
+    }
+    .content > .content{
+        border: 1px solid #eee;
+    }
+</style>
+<script type="text/javascript">
+    Vue.component('app-contents', {
+        template: '#content-template',
+        props: { 
+            "config" : {
+                "type" : Object,
+                "default": {}
+            },
+        },
+        mounted:function(){
+            console.log("app-contents.config",this.config);
+        },
+        data: function() {
+            return { 
+                
+            }
+        },
+        methods: {
+            prevPosition:function(){
+                this.config.position--;
+                if (this.config.position<0){
+                    this.config.position=0;
+                }
+            },
+            nextPosition:function(){
+                this.config.position++;
+                if (this.config.position>=this.config.contents.length){
+                    this.config.position=this.config.contents.length-1;
+                }
+            },
+            enableNextContent:function(){
+                console.log("enabled");
+                var next=this.config.contents[this.config.position+1];
+                if (next){
+                    next.disabled=false;
+                }
+            }
+        },
+        computed: {
+            debug: function(){
+                return app.debug;
+            },
+            currentContent:function(){
+                return this.config.contents[this.config.position];
+            },
+            prevDisabled: function(){
+                if (this.config.position==0) return true;
+                return false;
+            },
+            nextDisabled: function(){
+                if (this.config.position+1>=this.config.contents.length) return true;
+                var next=this.config.contents[this.config.position+1];
+                if (next.disabled){
+                    return true;
+                }
+                return false;
+            },
+        }
+    });
+</script>
