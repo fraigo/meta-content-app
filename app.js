@@ -10,7 +10,7 @@ var app = new Vue({
         var self=this;
         console.log("created");
         this.loadComponents(["app-contents","app-question","app-text","app-video"],function(){
-            var view=document.location.hash.replace("#","");
+            var view=document.location.hash.replace("#","").split("/")[0];
             if (view==""){
                 view="example";
             }

@@ -12,7 +12,7 @@
         </div>
         <p v-if="config.position==-1">{{config.description}}</p>
         <div v-if="config.position==-1" class="content-menu">
-            <button class="content-menu-item" @click="config.position=idx" v-for="(item,idx) in config.contents" :disabled="item.disabled">{{idx+1}}</button>
+            <button class="content-menu-item" @click="goToPosition(idx)" v-for="(item,idx) in config.contents" :disabled="item.disabled">{{idx+1}}</button>
         </div>    
         <div 
             :key="config.position"
@@ -91,7 +91,7 @@
         max-height: 140px;
         width: 40vw;
         height: 40vw;
-        border: 1px solid #eee;
+        border: 1px solid #ccc;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -121,34 +121,52 @@
             }
         },
         mounted:function(){
+            var self=this;
             console.log("app-contents.config",this.config);
             window.addEventListener("scroll",function(){
 
             })
+            window.addEventListener("hashchange",function(){
+                self.goTo(document.location.hash.replace("#",""))
+            })
+            var hash=document.location.hash.replace("#","");
+            self.base=hash.split("/")[0];
+            self.goTo(hash);
         },
         data: function() {
             return { 
-                menu: true
+                menu: true,
+                root: ""
             }
         },
         methods: {
-            goToMenu(){
-                this.config.position=-1;
+            goTo:function(path){
                 window.scrollTo(0,0);
+                var view=path.replace("#","").split("/");
+                console.log(view);
+            },
+            goToPosition:function(pos){
+                this.config.position=pos;
+                var item=this.config.contents[this.config.position];
+                document.location="#"+this.base+"/"+item.id;
+            },
+            goToMenu:function(){
+                this.config.position=-1;
+                document.location="#"+this.base;
             },
             prevPosition:function(){
                 this.config.position--;
                 if (this.config.position<0){
                     this.config.position=0;
                 }
-                window.scrollTo(0,0);
+                this.goToPosition(this.config.position);
             },
             nextPosition:function(){
                 this.config.position++;
                 if (this.config.position>=this.config.contents.length){
                     this.config.position=this.config.contents.length-1;
                 }
-                window.scrollTo(0,0);
+                this.goToPosition(this.config.position);
             },
             enableNextContent:function(){
                 console.log("enabled");
