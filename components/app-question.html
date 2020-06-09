@@ -2,7 +2,7 @@
 <script type="text/x-template" id="question-template">
     <div class="question-content" >
         <h2>{{config.title}}</h2>
-        <p>{{config.description}}</p>
+        <p v-html="config.description"></p>
         <ul>
             <li v-for="(option,index) in config.options" :key="index" >
                 <input type="radio" :name="id+'opt'" @change="checkAnswer()" v-model="config.selected" :id="id+index" :value="index"><label :for="id+index">{{option}}</label>
@@ -25,6 +25,7 @@
     padding-left: 1em;
     line-height: 2em;
 }
+
 </style>
 <script type="text/javascript">
 Vue.component('app-question', {

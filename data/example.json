@@ -2,7 +2,7 @@
     "type" : "app-contents",
     "title" : "Example",
     "description" : "Example content",
-    "position" : 0,
+    "position" : -1,
     "contents" : [
         {
             "type" : "app-video",
@@ -35,9 +35,7 @@
                 "Option 4"
             ],
             "correct" : 2,
-            "finishedWhen" : {
-                
-            }
+            "disabled": true
         },
         {
             "type" : "app-video",

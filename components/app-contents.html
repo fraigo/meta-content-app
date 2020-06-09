@@ -1,19 +1,28 @@
 <!-- content-template -->
 <script type="text/x-template" id="content-template">
-    <div class="content" >
+    <div class="content" :id="id">
         <div class="content-header">
             <h1>{{config.title}}</h1>
             <span></span>
-            <button @click="prevPosition()" :disabled="prevDisabled" >Prev</button>
-            <button @click="nextPosition()" :disabled="nextDisabled" >Next</button>
+            <div class="content-buttons">
+                <button v-if="config.position>=0" @click="prevPosition()" :disabled="prevDisabled" >Prev</button>
+                <button v-if="config.position>=0" @click="goToMenu()"  >Menu</button>
+                <button v-if="config.position>=0" @click="nextPosition()" :disabled="nextDisabled" >Next</button>
+            </div>
         </div>
-        <p>{{config.description}}</p>
+        <p v-if="config.position==-1">{{config.description}}</p>
+        <div v-if="config.position==-1" class="content-menu">
+            <button class="content-menu-item" @click="config.position=idx" v-for="(item,idx) in config.contents" :disabled="item.disabled">{{idx+1}}</button>
+        </div>    
         <div 
             :key="config.position"
-            v-if="config.contents && config.contents.length" 
+            v-if="config.position>=0 && config.contents && config.contents.length" 
             :is="currentContent.type" 
             @finished="enableNextContent()"
             :config="currentContent" ></div>
+        <div class="content-footer" v-if="!nextDisabled && config.position>=0">
+            <button v-if="config.position>=0" @click="nextPosition()" :disabled="nextDisabled" >Next</button>
+        </div>
         <pre v-if="debug">{{currentContent}}</pre>
     </div>
 </script>
@@ -35,17 +44,67 @@
         padding: 1em;
         box-shadow: 0 0 5px 5px rgba(0,0,0,0.2);
     }
+    .content-buttons{
+        display: flex;
+    }
+    .content-buttons button{
+        font-size: 12px;
+        border-radius: 0;
+        border: 1px solid #ccc;
+    }
+    .content-buttons button:first-child{
+        border-radius: 3px 0 0 3px;
+    }
+    .content-buttons button:last-child{
+        border-radius: 0 3px 3px 0;
+    }
     .content-header > span{
         flex: 1 0;
     }
     #app > .content{
-        padding-top: 4em;
+        padding-top: 4.5em;
     }
     .content  h1{
         margin: 0 0 .5em 0;
+        font-size: 1.6em;
+    }
+    @media (max-width:400px){
+        .content  h1{
+            margin: 0 0 .5em 0;
+            font-size: 1.4em;
+        }
+    }
+    .content  h2{
+        margin: 0 0 .5em 0;
+        font-size: 1.2em;
     }
     .content > .content{
         border: 1px solid #eee;
+    }
+    .content-menu{
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .content-menu-item{
+        max-width: 140px;
+        max-height: 140px;
+        width: 40vw;
+        height: 40vw;
+        border: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1em;
+    }
+    .content-footer{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        padding: 1em;
+        background-color: rgba(255,255,255,0.9);
     }
 </style>
 <script type="text/javascript">
@@ -56,27 +115,40 @@
                 "type" : Object,
                 "default": {}
             },
+            "id" : {
+                "type" : String,
+                "default": "c"+Math.round(Math.random()*100000)
+            }
         },
         mounted:function(){
             console.log("app-contents.config",this.config);
+            window.addEventListener("scroll",function(){
+
+            })
         },
         data: function() {
             return { 
-                
+                menu: true
             }
         },
         methods: {
+            goToMenu(){
+                this.config.position=-1;
+                window.scrollTo(0,0);
+            },
             prevPosition:function(){
                 this.config.position--;
                 if (this.config.position<0){
                     this.config.position=0;
                 }
+                window.scrollTo(0,0);
             },
             nextPosition:function(){
                 this.config.position++;
                 if (this.config.position>=this.config.contents.length){
                     this.config.position=this.config.contents.length-1;
                 }
+                window.scrollTo(0,0);
             },
             enableNextContent:function(){
                 console.log("enabled");

@@ -2,12 +2,17 @@
 <script type="text/x-template" id="text-template">
     <div class="text-content" >
         <h2>{{config.title}}</h2>
-        <p>{{config.description}}</p>
+        <p v-html="config.description"></p>
     </div>
 </script>
 <style>
 .text-content{
-    font-size: 18px;
+    font-size: 16px;
+    line-height: 1.5em;
+}
+.text-content br{
+    display: block;
+    height: 1em;
 }
 </style>
 <script type="text/javascript">
@@ -31,6 +36,7 @@ Vue.component('app-text', {
     mounted:function(){
         console.log("app-text.config",this.content);
         var self = this;
+        self.$emit('finished');
     },
     methods: {
         
