@@ -5,9 +5,17 @@
         <p v-html="config.description"></p>
         <ul>
             <li v-for="(option,index) in config.options" :key="index" >
-                <input type="radio" :name="id+'opt'" @change="checkAnswer()" v-model="config.selected" :id="id+index" :value="index"><label :for="id+index">{{option}}</label>
+                <input :disabled="config.result>0" type="radio" :name="id+'opt'" @change="checkAnswer()" v-model="config.selected" :id="id+index" :value="index"><label :for="id+index">{{option}}</label>
             </li>
         </ul>
+        <p class="question-success" v-if="config.result==1">
+            {{config.success?config.success:'Correct!'}}
+        </p>
+        <p class="question-error" v-if="config.result==2">
+            {{config.error?config.error:'Wrong answer!'}}
+            <br>
+            <button @click="tryAgain()">Go back and try Again</button>
+        </p>
     </div>
 </script>
 <style>
@@ -25,7 +33,14 @@
     padding-left: 1em;
     line-height: 2em;
 }
-
+.question-success{
+    color: #080;
+    text-align: center;
+}
+.question-error{
+    color: #800;
+    text-align: center;
+}
 </style>
 <script type="text/javascript">
 Vue.component('app-question', {
@@ -54,7 +69,15 @@ Vue.component('app-question', {
             console.log("Checking",this.config.selected,this.config.correct);
             if (this.config.selected==this.config.correct){
                 this.$emit("finished");
+                this.config.result=1
+            }else{
+                this.config.result=2
             }
+        },
+        tryAgain:function(){
+            this.config.result=0;
+            this.config.selected=null;
+            this.$emit("back");
         }
     },
     computed:{

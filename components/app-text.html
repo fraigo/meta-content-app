@@ -3,7 +3,7 @@
     <div class="text-content" >
         <h2>{{config.title}}</h2>
         <img v-if="config.image" :src="config.image" width="100%">
-        <p v-html="config.description"></p>
+        <div v-html="config.description"></div>
     </div>
 </script>
 <style>
@@ -24,7 +24,8 @@
     .text-content img{
         max-width: 40%;
         float: left;
-        padding-right: 20px;
+        padding-right: 30px;
+        padding-bottom: 20px;
     }
 }
 </style>
@@ -49,7 +50,9 @@ Vue.component('app-text', {
     mounted:function(){
         console.log("app-text.config",this.content);
         var self = this;
-        self.$emit('finished');
+        setTimeout(function(){
+            self.$emit('finished');
+        },1000);
     },
     methods: {
         

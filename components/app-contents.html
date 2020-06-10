@@ -12,7 +12,10 @@
         </div>
         <p v-if="config.position==-1">{{config.description}}</p>
         <div v-if="config.position==-1" class="content-menu">
-            <button class="content-menu-item" @click="goToPosition(idx)" v-for="(item,idx) in config.contents" :disabled="item.disabled">{{idx+1}}</button>
+            <button class="content-menu-item" @click="goToPosition(idx)" v-for="(item,idx) in config.contents" :disabled="item.disabled">
+                {{idx+1}}
+                <i class="material-icons">{{iconType(item.type)}}</i>
+            </button>
             <div class="space"></div>
         </div>    
         <div 
@@ -20,6 +23,7 @@
             v-if="config.position>=0 && config.contents && config.contents.length" 
             :is="currentContent.type" 
             @finished="enableNextContent()"
+            @back="prevPosition()"
             :config="currentContent" ></div>
         <div class="content-footer" v-if="!nextDisabled && config.position>=0">
             <button v-if="config.position>=0" @click="nextPosition()" :disabled="nextDisabled" >Next</button>
@@ -96,6 +100,16 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto 1em auto;
+        font-size: 2em;
+        flex-direction: column;
+    }
+    .content-icon{
+        width: 32px;
+        height: 32px;
+        display: inline-block;
+    }
+    .app-text{
+        content: "",
     }
     .content-footer{
         position: fixed;
@@ -142,11 +156,17 @@
         methods: {
             goTo:function(path){
                 var view=path.replace("#","").split("/");
+                var found=false;
                 for(var i=0; i<this.config.contents.length; i++){
                     var item=this.config.contents[i];
                     if (item.id==view[1]){
                         this.config.position=i;
+                        found=true;
                     }
+                }
+                if (view[1] && !found){
+                    document.location="#"+view[0];
+                    return;
                 }
                 window.scrollTo(0,0);
                 console.log(view);
@@ -180,6 +200,13 @@
                 if (next){
                     next.disabled=false;
                 }
+            },
+            iconType:function(type){
+                var types={
+                    "app-text": "article",
+                    "app-question": "help_center"
+                }
+                return types[type]?types[type]:"view_headline";
             }
         },
         computed: {

@@ -1,0 +1,149 @@
+{
+ "type": "app-contents",
+ "title": "Programación",
+ "description": "Este es un tutorial paso a paso para introducir la programación en el lenguaje Javascript. Comenzaremos con algunas definiciones.",
+ "position": -1,
+ "contents": [
+  {
+   "type": "app-text",
+   "id": "what-is-a-program",
+   "title": "¿Qué es un programa?",
+   "image": "/data/programming/computer_human.jpg",
+   "description": "<div>Un <b>programa</b> es un conjunto de instrucciones que le indican a la computadora qué hacer.</div><div>La computadora puede entender un conjunto fijo de <b>comandos</b> (<i>lenguaje de máquina</i>), pero estas instrucciones son a menudo demasiado complicadas de entender para los humanos.</div><div>Por otro lado, los <b>lenguajes humanos</b> son demasiado <i>ambiguos</i> y difíciles de entender para una computadora.</div>"
+  },
+  {
+   "type": "app-question",
+   "id": "question-what-is-a-program",
+   "title": "¿Qué es un programa?",
+   "description": "Un programa es:",
+   "disabled": true,
+   "options": [
+    "Una lista de instrucciones en idioma inglés",
+    "Un conjunto de instrucciones específicas para decirle a la computadora qué hacer",
+    "Una lista de comandos que solo entiende una computadora"
+   ],
+   "correct": 1
+  },
+  {
+   "type": "app-text",
+   "id": "programming",
+   "disabled": true,
+   "image": "/data/programming/computer_programming.jpg",
+   "title": "¿Qué es la programación?",
+   "description": "La programación es la forma de <b> dar instrucciones a una computadora </b>. Podemos <b> escribir programas de computadora </b> en <i> <a href=\"#programming/programming-language\"> lenguajes de programación </a> </i> especialmente diseñados para computadoras. <br> Computadoras puede entender y traducir estos idiomas a <i> lenguaje máquina </i>."
+  },
+  {
+   "type": "app-question",
+   "id": "question-programming",
+   "title": "¿Qué es la programación?",
+   "disabled": true,
+   "description": "¿Cómo podemos programar una computadora?",
+   "options": [
+     "Las computadoras no pueden entender ningún lenguaje",
+     "Utilizando un conjunto de circuitos eléctricos",
+     "Escribir programas en un lenguaje de programación"
+   ],
+   "correct": 2
+  },
+  {
+   "type": "app-text",
+   "id": "programming-language",
+   "disabled": true,
+   "title": "¿Qué es un lenguaje de programación?",
+   "image": "/data/programming/programming_languages.jpg",
+   "description": "Un lenguaje de programación es un conjunto de <b> instrucciones legibles por humanos </b> (<i> comandos </i>) que podrían <i> traducirse al lenguaje de máquina </i>. <br> Hay muchos lenguajes de programación, por ejemplo, <b> Javascript, Python, C, Java </b> y otros. <br> Las principales diferencias entre los lenguajes de programación son su <i> sintaxis y palabras clave especiales </i>."
+  },
+  {
+   "type": "app-question",
+   "id": "question-programming-language",
+   "title": "¿Qué es un lenguaje de programación?",
+   "disabled": true,
+   "description": "Un lenguaje de programación es:",
+   "options": [
+    "Código entendible por humanos que se puede traducir al lenguaje informático",
+     "Un conjunto de instrucciones no legibles para humanos, solo para computadoras",
+     "Un lenguaje especial utilizado para que los programadores hablen con las computadoras"
+   ],
+   "correct": 0
+  },
+  {
+   "type": "app-text",
+   "id": "interpreters",
+   "disabled": true,
+   "title": "Intérpretes",
+   "image": "/data/programming/interpretation.jpg",
+   "description": "Un <b>intérprete</b> puede recibir un conjunto de instrucciones (código de programa), cargar, traducir y ejecutar el programa <b> inmediatamente </b>. <br> Dado que el código del programa se traduce <i> sobre la marcha </i>, si en algún momento el programa cargado tiene <i> errores de sintaxis </i>, el intérprete detiene la ejecución. <br> Características principales: <br> <ul> <li> El código del programa podría ejecutarse en cualquier máquina, si hay un intérprete disponible </li> <li> El programa está listo para ejecutarse inmediatamente (análisis y optimización simplificados) </li> <li> Al utilizar un programa intermediario como intérprete, el rendimiento de la ejecución podría ser inferior a un programa compilado. </li> </ul>"
+  },
+  {
+   "type": "app-question",
+   "id": "question-interpreters",
+   "title": "Intérpretes",
+   "disabled": true,
+   "description": "Como functiona un intprete?",
+   "options": [
+    "Toma un conjunto de archivos de programa para generar un ejecutable binario",
+    "Traduce instrucciones legibles para humanos ejecutándolas en lenguaje de máquina sobre la marcha",
+    "Convierte instrucciones en inglés en código binario"
+   ],
+   "correct": 1
+  },
+  {
+   "type": "app-text",
+   "id": "compilers",
+   "disabled": true,
+   "title": "Compiladores",
+   "image": "/data/programming/compiler-machine.png",
+   "description": "Un <b> compilador </b> puede procesar un conjunto de archivos de programa para <b> verificar y traducir </b> el código (<i> compilación </i>) al lenguaje de máquina. El resultado es un archivo de programa ejecutable. <br> Características principales: <br> <ul> <li> El programa ejecutable resultante se ejecutará en sistemas específicos (<i> arquitectura </i>) que comprende el código de máquina (específico del sistema ) </li> <li> El proceso de compilación podría tomar tiempo adicional para analizar, verificar, optimizar y traducir el programa. </li> <li> No hay intermediario. Una vez compilado, el programa podría ejecutarse más rápido que los programas interpretados. </li> </ul>"
+  },
+  {
+   "type": "app-question",
+   "id": "question-compilers",
+   "title": "Compiladores",
+   "disabled": true,
+   "description": "¿Cuál es la diferencia entre intérpretes y compiladores?",
+   "options": [
+    "Los intérpretes necesitan más tiempo que los compiladores para analizar, verificar y optimizar el código antes de ejecutar un programa",
+    "Los programas compilados están restringidos a sistemas específicos. Los programas interpretados pueden ejecutarse en cualquier sistema donde haya un intérprete disponible",
+    "Los programas compilados deben compilarse cada vez que se ejecuta el programa. Los programas interpretados no"
+   ],
+   "correct": 1
+  },
+  {
+   "type": "app-text",
+   "id": "errors",
+   "disabled": true,
+   "title": "Errores",
+   "image": "/data/programming/computer_error.jpg",
+   "description": "Existen diferentes tipos de errores (también llamados <i> Errores </i>), dependiendo de la etapa del ciclo de vida del programa. <br> <b> Error en tiempo de compilación: </b> Cuando el compilador encuentra < b> errores de código o sintaxis no válida </b> antes de ejecutar un programa, el proceso de compilación falla y no se crea ningún programa ejecutable. <br> Ejemplos de errores en tiempo de compilación son: <i> Errores de sintaxis, errores de tipo, clase no encontrada , Variable indefinida </i> <br> <b> Error en tiempo de ejecución: </b> cuando se produce un error inesperado <i> durante la ejecución </i> del programa compilado debido a causas internas o externas (no detectado en tiempo de compilación). <br> Ejemplos de errores en tiempo de ejecución son: <i> División por cero, Memoria insuficiente, Asignación de puntero nulo, Archivo no encontrado, Error de red. </i> <br> Como un caso especial Para los intérpretes, se pueden encontrar errores en tiempo de compilación durante el tiempo de ejecución."
+  },
+  {
+   "type": "app-question",
+   "id": "question-errors",
+   "title": "Errores",
+   "disabled": true,
+   "description": "Ejemplos de errores en tiempo de compilación (errores de código) son:",
+   "options": [
+    "Errores de sintaxis, división por cero, error de red",
+     "Errores de tipo, asignaciones de puntero nulo, memoria insuficiente",
+     "Errores de tipo, errores de sintaxis, variables indefinidas"
+   ],
+   "correct": 1
+  },
+  {
+   "type": "app-text",
+   "id": "debugging",
+   "disabled": true,
+   "title": "Debugging",
+   "image": "/data/programming/debugging.png",
+   "description": "<b>Debugging</b> is the process to analyze the execution of a program to detect and correct run-time errors and logical errors.<br> Sometimes a running program does something wrong/unexpected or fails without notice. In those cases, programmers will check the sequence of execution to detect any problem:<br><ul><li>Verifying current variables, values and state.</li><li>Checking the order and conditions of execution steps (program logic).</li><li>Capturing and isolating failures (exceptions) to find root causes</li></ul>"
+  },
+  {
+   "type": "app-text",
+   "id": "debugging-tools",
+   "disabled": true,
+   "title": "Debugging Tools",
+   "image": "/data/programming/debugging.png",
+   "description": "There are 3 important tools to help debug applications:<ul><li><b>A debugger application:</b> Allows to execute the program step by step, to inspect current values and verify the expected code sequence</li><li><b>Application logs</b>: Files storing run-time application messages, to help find clues for errors and wrong behavior.</li><li><b>Stack Traces</b>: Run-time information (<i>call stack</i>) with errors/exceptions messages, loaded files and functions called to reach some execution point. Sometimes, an error is caused in another level of execution, not the failing point.</li></ul>"
+  }
+ ]
+}
